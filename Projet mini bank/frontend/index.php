@@ -23,12 +23,12 @@
         if ($page == 'ajouter') {
             // Appelle du formulaire d'ajout
             echo "<h2>Enregistrer un nouveau client</h2>";
-            include 'formulaires/add_client.php';
+            include 'FORMULAIRES/add_client.php';
         } 
         elseif ($page == 'transaction') {
             // Appelle du formulaire de transaction
             echo "<h2>Effectuer un dépôt ou retrait</h2>";
-            include 'formulaires/transaction.php';
+            include 'FORMULAIRES/transaction.php';
         } 
         else {
             // Affichage par défaut : La liste des clients

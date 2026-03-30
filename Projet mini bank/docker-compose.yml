@@ -22,7 +22,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # CRITIQUE : Relie votre dossier 'frontend' au serveur
+      # CRITIQUE : Relie mon dossier 'frontend' au serveur
       - ./frontend:/var/www/html
     depends_on:
       - db
