@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Service Base de Données
+  db:
+    image: mysql:8.0
+    container_name: minibank-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: minibank
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      # Importation automatique des scripts SQL au démarrage
+      - ./sql:/docker-entrypoint-initdb.d
+
+  # Service Application Web
+  php:
+    image: php:8.2-apache
+    container_name: minibank-php
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+    # Installation de l'extension PDO MySQL requise pour le projet
+    command: >
+      sh -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
