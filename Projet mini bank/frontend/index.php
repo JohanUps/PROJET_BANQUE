@@ -30,6 +30,11 @@
             echo "<h2>Effectuer un dépôt ou retrait</h2>";
             include 'FORMULAIRES/transaction.php';
         } 
+        elseif($page=='modifier'){
+            //Appelle du formulaire de modification
+            echo "<h2>Modifier un client</h2>";
+            include 'FORMULAIRES/edit_client.php';
+        }
         else {
             // Affichage par défaut : La liste des clients
             ?>
