@@ -32,8 +32,13 @@
         } 
         elseif($page=='modifier'){
             //Appelle du formulaire de modification
-            echo "<h2>Modifier un client</h2>";
+            echo "<h2>enregistrer les modification</h2>";
             include 'FORMULAIRES/edit_client.php';
+        }
+        elseif ($page == 'nouveau_compte') {
+            //appel du formulaire compte
+            echo "<h2>Ouverture de compte</h2>";
+            include 'FORMULAIRES/add_compte.php';
         }
         else {
             // Affichage par défaut : La liste des clients
