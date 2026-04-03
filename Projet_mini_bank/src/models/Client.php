@@ -1,5 +1,5 @@
 <?php
-require_once "config/Database.php"; //Connexion à la BD
+require_once __DIR__ . '/../config/Database.php'; //Connexion à la BD
 
 class Client{
     //
@@ -13,6 +13,9 @@ class Client{
 
     public function __construct($db)
     {
+        if (!$db) {
+            die("DB non initialisée dans Client");
+        }
         $this->pdo = $db;
     }
     //Fonction de nettoyage des attributs

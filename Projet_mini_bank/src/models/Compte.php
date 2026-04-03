@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/Database.php'; //Connexion à la BD
 
 class Compte{
 
@@ -8,7 +9,7 @@ class Compte{
     private $id;
     private $client_id;
     private $solde;
-    private $date_creation;
+    private $numero_compte;
 
     public function __construct($db)
     {
@@ -47,7 +48,16 @@ class Compte{
         $this->id = (int) $data['id'];
         $this->client_id = (int) $data['client_id'];
         $this->solde = (float) $data['solde'];
-        $this->date_creation = $data['date_creation'];
+    }
+
+    //A refaire(unicité non garantie)
+    private function generateNumeroCompte(){
+        $prefix = "FR76";
+
+        //génère 11 chiffres aléatoires
+        $random = str_pad(mt_rand(0, 99999999999), 11, '0', STR_PAD_LEFT);
+
+        return $prefix . $random;
     }
 
     //CRUD : CREATE
@@ -68,10 +78,20 @@ class Compte{
             return false;
         }
 
+        //Génère un numéro de compte aléatoire
+        $this->numero_compte = $this->generateNumeroCompte();
+
         //Ajout du compte a la BD
-        $query = "INSERT INTO {$this->table_name} (client_id, solde) VALUES (:client_id, :solde)";
+        $query = "INSERT INTO {$this->table_name} (numero_compte, client_id, solde) 
+                VALUES (:numero_compte, :client_id, :solde)";
+        
         $stmt = $this->pdo->prepare($query);
-        $success = $stmt->execute([":client_id" => $this->client_id, ":solde"=>$this->solde]); 
+
+        $success = $stmt->execute([
+            ":numero_compte" => $this->numero_compte,
+            ":client_id" => $this->client_id,
+            ":solde" => $this->solde
+        ]); 
         
         if($success){
             $this->id = (int) $this->pdo->lastInsertId();

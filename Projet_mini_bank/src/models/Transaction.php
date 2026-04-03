@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . "/../config/Database.php";
 
 class Transaction{
     private $pdo;
@@ -132,7 +133,3 @@ class Transaction{
     public function setMontant($montant){ $this->montant = $montant; }
     public function setType($type){ $this->type = $type; }
 }
-
-
-
-

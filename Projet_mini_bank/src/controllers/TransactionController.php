@@ -1,6 +1,6 @@
 <?php
-require_once "config/Database.php";
-require_once "models/Transaction.php";
+require_once __DIR__ . "/../config/Database.php";
+require_once __DIR__ . "/../models/Transaction.php";
 
 class TransactionController {
 
@@ -12,16 +12,19 @@ class TransactionController {
         $this->transaction = new Transaction($db);
     }
 
-    //CRUD : CREATE
+    // ======================
+    // CREATE
+    // ======================
     public function create(){
 
         if (!isset($_GET['compte_id'])) {
             $_SESSION['error'] = "Compte manquant";
-            header("Location: index.php");
+            header("Location: page=liste");
             exit;
         }
 
         $compte_id = (int) $_GET['compte_id'];
+        $client_id = $_GET['client_id'] ?? '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -33,21 +36,26 @@ class TransactionController {
 
             if ($id) {
                 $_SESSION['success'] = "Transaction effectuée avec succès";
-                header("Location: index.php?controller=transaction&action=list&compte_id=".$compte_id);
-                exit;
+
+                //header("Location: page=transactions&compte_id=".$compte_id."&client_id=".$client_id);
+                //exit;
+                die("REDIRECTION ICI");
             } else {
                 $_SESSION['error'] = "Erreur (solde insuffisant ou données non valides)";
             }
         }
 
-        require "views/transactions/create.php";
+        require __DIR__ . "/../views/transactions/create.php";
     }
 
+    // ======================
+    // LIST
+    // ======================
     public function list(){
 
         if (!isset($_GET['compte_id'])) {
             $_SESSION['error'] = "Compte manquant";
-            header("Location: index.php");
+            header("Location: page=liste");
             exit;
         }
 
@@ -55,6 +63,6 @@ class TransactionController {
 
         $transactions = $this->transaction->readByCompte($compte_id);
 
-        require "views/transactions/list.php";
+        require __DIR__ . "/../views/transactions/list.php";
     }
 }

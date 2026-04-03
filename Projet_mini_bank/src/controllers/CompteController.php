@@ -1,66 +1,68 @@
 <?php
-require_once "config/Database.php";
-require_once "models/Compte.php";
+require_once __DIR__ . '/../models/Compte.php';
 
 class CompteController {
 
     private $compte;
 
     public function __construct(){
-        session_start();//Demarage d'une session pour envoyer des informations sur le déroulement des opérations
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();//Demarage d'une session pour envoyer des informations sur le déroulement des opérations
+        }
         $db = (new Database())->getConnection();
         $this->compte = new Compte($db);
     }
 
     //CREATE avec pré
     public function create(){
-        //Vérification : la page indique sur le compte de quel client on travaille
-        if(!isset($_GET['client_id'])){
-            $_SESSION['error'] = "Client non indiqué";
-            header("Location: index.php?controller=client&action=list"); //renvoie a la liste des clients
-            exit;
-        }
 
-        $client_id = (int) $_GET['client_id'];
+    if(!isset($_GET['client_id'])){
+        $_SESSION['error'] = "Client non indiqué";
+        header("Location: page=liste");
+        exit;
+    }
 
-        //CREATION DU COMPTE
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $this->compte->setClientId($client_id);
-            $this->compte->setSolde($_POST['solde'] ?? 0); //Sauf de 0 par defaut
-        }
+    $client_id = (int) $_GET['client_id'];
+
+    if($_SERVER['REQUEST_METHOD'] === 'POST'){
+
+        $this->compte->setClientId($client_id);
+        $this->compte->setSolde($_POST['solde'] ?? 0);
 
         $id = $this->compte->create();
 
-        //Cas ou le compte est créé
         if($id){
             $_SESSION['success'] = "Compte créé";
-            header("Location: index.php?controller=compte&action=list&client_id=".$client_id);
+            header("Location: page=comptes&client_id=".$client_id);
             exit;
         } else {
             $_SESSION['error'] = "Erreur lors de la création du compte";
         }
-        require "views/comptes/create.php";
     }
+
+    require __DIR__ . '/../views/comptes/create.php';
+}
     
-    public function readAll(){
+    public function read(){
         if (!isset($_GET['client_id'])) {
             $_SESSION['error'] = "Client manquant";
-            header("Location: index.php?controller=client&action=list");
+            header("Location: page=liste");
             exit;
         }
+        $page = $_GET['page'] ?? 'comptes';
 
         $client_id = (int) $_GET['client_id'];
 
         $comptes = $this->compte->readByClient($client_id);
         
-        require "views/comptes/list.php";
+        require __DIR__ . '/../views/comptes/list.php';
 
     }
 
     public function delete(){
         if (!isset($_GET['id']) || !isset($_GET['client_id'])) {
             $_SESSION['error'] = "Paramètres manquants";
-            header("Location: index.php?controller=client&action=list");
+            header("Location: page=liste");
             exit;
         }
 
@@ -75,7 +77,7 @@ class CompteController {
             $_SESSION['error'] = "Impossible de supprimer ce compte (transactions existantes)";
         }
 
-        header("Location: index.php?controller=compte&action=list&client_id=".$client_id);
+        header("Location: page=comptes&client_id=".$client_id);
         exit;
     
     }

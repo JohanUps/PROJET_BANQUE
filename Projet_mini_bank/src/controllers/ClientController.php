@@ -1,13 +1,13 @@
 <?php
-require_once "config/Database.php";
-require_once "models/Client.php";
-
+require_once __DIR__ . '/../models/Client.php';
 
 class ClientController {
     private $client;
     //Connexion a la BD au moment de la création
     public function __construct(){
-        session_start(); //Utile pour récupérer des messages
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start(); //Utile pour récupérer des messages
+        }
         $db = (new Database())->getConnection();
         $this->client = new Client($db);
     }
@@ -25,13 +25,13 @@ class ClientController {
 
             if($id){
                 $_SESSION['success'] = "Client créé avec succès";
-                header("Location: index.php?controller=client&action=list");
+                header("Location: routeur.php?page=liste");
                 exit;
             } else {
                 $_SESSION['error'] = "Erreur lors de la création d'un client";
             }
         }
-        require "views/clients/create.php";
+        require __DIR__ . '/../views/clients/create.php';
     }
 
 
@@ -40,6 +40,11 @@ class ClientController {
         $page = $_GET['page'] ?? 1;
         $page = (int)$page;
 
+        //Evite un offset négatif si $page = 0
+        if($page<1){
+            $page = 1;
+        }
+
         $offset = ($page - 1) * 5;
 
         //Variable utiliser dans la view
@@ -47,7 +52,7 @@ class ClientController {
         $total = $this->client->count();
         $totalPages = ceil($total / 5);
 
-        require "views/clients/list.php";
+        require __DIR__ . '/../views/clients/list.php';
     }
 
     public function edit(){
@@ -58,7 +63,7 @@ class ClientController {
             // Vérification de l'ID
             if (!isset($_POST['id'])) {
                 $_SESSION['error'] = "ID manquant";
-                header("Location: index.php?controller=client&action=list");
+                header("Location: page=liste");
                 exit;
             }
 
@@ -72,7 +77,7 @@ class ClientController {
             // Mise à jour
             if ($this->client->update()) {
                 $_SESSION['success'] = "Client modifié avec succès";
-                header("Location: index.php?controller=client&action=list");
+                header("Location: page=liste");
                 exit;
             } else {
                 $_SESSION['error'] = "Erreur lors de la modification";
@@ -84,7 +89,7 @@ class ClientController {
         //Vérification de l'ID
         if (!isset($_GET['id'])) {
             $_SESSION['error'] = "ID manquant";
-            header("Location: index.php?controller=client&action=list");
+            header("Location: page=liste");
             exit;
         }
 
@@ -95,27 +100,25 @@ class ClientController {
         //Vérifie si le client existe
         if (!$data) {
             $_SESSION['error'] = "Client introuvable";
-            header("Location: index.php?controller=client&action=list");
+            header("Location: page=liste");
             exit;
         }
 
         // Affichage de la vue
-        require "views/clients/edit.php";
+        require __DIR__ . '/../views/clients/edit.php';
     }
     
     public function delete(){
 
         if (!isset($_GET['id'])) {
             $_SESSION['error'] = "ID manquant";
-            header("Location: index.php?controller=client&action=list");
+            header("Location: page=liste");
             exit;
         }
 
         $this->client->setId($_GET['id']);
         $this->client->delete();
-        header("Location: index.php?controller=client&action=list");
+        header("Location: page=liste");
         exit;
     }
-
-
 }
